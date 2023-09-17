@@ -14,67 +14,68 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 app.get('/', (req, res) =>
-  res.sendFile(path.join(__dirname, '/public/index.html'))
+    res.sendFile(path.join(__dirname, '/public/index.html'))
 );
 
 // GET request for notes
 app.get('/api/notes', (req, res) => {
     // Send a message to the client
     res.status(200).json(`${req.method} request received to get notes`);
-  
+
     // Log our request to the terminal
     console.info(`${req.method} request received to get notes`);
-  });
+});
 
-  // POST request to add a review
-app.post('/api/reviews', (req, res) => {
-  // Log that a POST request was received
-  console.info(`${req.method} request received to add a review`);
 
-  // Destructuring assignment for the items in req.body
-  const { product, review, username } = req.body;
+// POST request to add a note
+app.post('/api/notes', (req, res) => {
+    // Log that a POST request was received
+    console.info(`${req.method} request received to add a note`);
 
-  // If all the required properties are present
-  if (product && review && username) {
-    // Variable for the object we will save
-    const newReview = {
-      product,
-      review,
-      username,
-      review_id: uuid(),
-    };
+    // Destructuring assignment for the items in req.body
+    const { title, text } = req.body;
 
-    // Obtain existing reviews
-    fs.readFile('./db/reviews.json', 'utf8', (err, data) => {
-      if (err) {
-        console.error(err);
-      } else {
-        // Convert string into JSON object
-        const parsedReviews = JSON.parse(data);
+    // If all the required properties are present
+    if (title && text ) {
+        // Variable for the object we will save
+        const newNote = {
+            title,
+            text,
+           
+            // review_id: uuid(),
+        };
 
-        // Add a new review
-        parsedReviews.push(newReview);
+        // Obtain existing notes
+        fs.readFile('./db/db.json', 'utf8', (err, data) => {
+            if (err) {
+                console.error(err);
+            } else {
+                // Convert string into JSON object
+                const parsednotes = JSON.parse(data);
 
-        // Write updated reviews back to the file
-        fs.writeFile(
-          './db/reviews.json',
-          JSON.stringify(parsedReviews, null, 4),
-          (writeErr) =>
-            writeErr
-              ? console.error(writeErr)
-              : console.info('Successfully updated reviews!')
-        );
-      }
-    });
+                // Add a new review
+                parsednotes.push(newNote);
 
-    const response = {
-      status: 'success',
-      body: newReview,
-    };
+                // Write updated notes back to the file
+                fs.writeFile(
+                    './db/db.json',
+                    JSON.stringify(parsednotes, null, 4),
+                    (writeErr) =>
+                        writeErr
+                            ? console.error(writeErr)
+                            : console.info('Successfully updated notes!')
+                );
+            }
+        });
 
-    console.log(response);
-    res.status(201).json(response);
-  } else {
-    res.status(500).json('Error in posting review');
-  }
+        const response = {
+            status: 'success',
+            body: newNote,
+        };
+
+        console.log(response);
+        res.status(201).json(response);
+    } else {
+        res.status(500).json('Error in posting note');
+    }
 });
