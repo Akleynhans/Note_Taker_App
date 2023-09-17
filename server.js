@@ -1,26 +1,29 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
-// Helper method for generating unique ids
-// const uuid = require('./helpers/uuid');
+const { clog } = require('./middleware/clog');
+const api = require('./routes/index.js');
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 const app = express();
+
+// Import custom middleware, "cLog"
+app.use(clog);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static('public'));
 
+// request for homepage
 app.get('/', (req, res) =>
     res.sendFile(path.join(__dirname, '/public/index.html'))
 );
 
 // GET request for notes
-app.get('/api/notes', (req, res) => {
-    // Send a message to the client
-    res.status(200).json(`${req.method} request received to get notes`);
+app.get('/notes', (req, res) => {
+    // Take to notes page
+    res.sendFile(path.join(__dirname, '/public/notes.html'))
 
     // Log our request to the terminal
     console.info(`${req.method} request received to get notes`);
@@ -28,7 +31,7 @@ app.get('/api/notes', (req, res) => {
 
 
 // POST request to add a note
-app.post('/api/notes', (req, res) => {
+app.post('/notes', (req, res) => {
     // Log that a POST request was received
     console.info(`${req.method} request received to add a note`);
 
