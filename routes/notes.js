@@ -1,4 +1,4 @@
-const notess = require('express').Router();
+const notes = require('express').Router();
 const { v4: uuidv4 } = require('uuid');
 const {
   readFromFile,
@@ -27,6 +27,7 @@ notes.get('/:note_id', (req, res) => {
 // DELETE Route for a specific note
 notes.delete('/:note_id', (req, res) => {
   const noteId = req.params.note_id;
+  console.log(noteId);
   readFromFile('./db/db.json')
     .then((data) => JSON.parse(data))
     .then((json) => {
@@ -45,13 +46,12 @@ notes.delete('/:note_id', (req, res) => {
 notes.post('/', (req, res) => {
   console.log(req.body);
 
-  const { username, topic, note } = req.body;
+  const { title, text,} = req.body;
 
   if (req.body) {
     const newnote = {
-      username,
-      note,
-      topic,
+      title,
+      text,
       note_id: uuidv4(),
     };
 
